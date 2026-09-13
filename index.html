@@ -1,16 +1,114 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#111827"><title>NEETOS — V2.1 Smart Syllabus</title><link rel="stylesheet" href="style.css"></head><body>
-<div class="app"><aside class="sidebar"><div class="brand"><div class="logo">N</div><div><b>NEETOS</b><small>NEET Preparation OS</small></div></div><nav>
-<button class="nav active" data-page="dashboard">⌂ <span>Dashboard</span></button><button class="nav" data-page="syllabus">▣ <span>Syllabus</span></button><button class="nav" data-page="planner">✓ <span>Today's Plan</span></button><button class="nav" data-page="revision">↻ <span>Revision</span></button><button class="nav" data-page="mocks">▤ <span>Mock Tests</span></button><button class="nav" data-page="mistakes">⚠ <span>Mistake Book</span></button><button class="nav" data-page="analytics">◈ <span>Analytics</span></button><button class="nav" data-page="focus">◷ <span>Focus</span></button>
-</nav><div class="side-note">V2.1 • Smart Syllabus<br><small>Progress is saved on this device.</small></div></aside>
-<main><header class="topbar"><div><div class="eyebrow">NEET 2027</div><h1 id="pageTitle">Dashboard</h1></div><button class="primary" id="quickAdd">＋ Quick Task</button></header>
-<section id="dashboard" class="page active"><div class="hero"><div><span class="pill">SMART SYLLABUS ENGINE</span><h2 id="heroTitle">Your next best task.</h2><p id="heroText"></p></div><button class="heroBtn" id="nextTaskBtn">WHAT SHOULD I STUDY NOW? →</button></div>
-<div class="grid stats"><div class="card stat"><span>Overall Syllabus</span><strong id="overall">0%</strong><div class="bar"><i id="overallBar"></i></div></div><div class="card stat"><span>Workflow Complete</span><strong id="workflowPct">0%</strong><small>Lecture → DPP → Module → PYQ → Revision</small></div><div class="card stat"><span>Today's Due</span><strong id="todayDue">0</strong><small>priority items</small></div><div class="card stat"><span>Mock Average</span><strong id="mockAvg">—</strong><small>recorded scores</small></div></div>
-<div class="grid two"><div class="card"><div class="cardHead"><h3>Today's priorities</h3><button class="ghost" data-go="planner">Open →</button></div><div id="dashTasks"></div></div><div class="card"><div class="cardHead"><h3>Next chapter workflow</h3><button class="ghost" data-go="syllabus">Open →</button></div><div id="dashWorkflow"></div></div></div></section>
-<section id="syllabus" class="page"><div class="sectionIntro"><div><h2>Complete syllabus tracker</h2><p>Lecture → DPP → Module → PYQ → Revision. Tap a step to mark it complete.</p></div><select id="subjectFilter"><option>All</option><option>Physics</option><option>Chemistry</option><option>Biology</option></select></div><div class="card"><div id="syllabusList"></div></div></section>
-<section id="planner" class="page"><div class="sectionIntro"><div><h2>Today's plan</h2><p>NEETOS generates priority tasks from your incomplete workflow.</p></div><button class="primary" id="addTask">＋ Add task</button></div><div class="card"><div id="taskList"></div></div></section>
-<section id="revision" class="page"><div class="sectionIntro"><div><h2>Revision queue</h2><p>Marking a Revision checkpoint starts the 1-3-7-15-30 cycle.</p></div><button class="primary" id="addRevision">＋ Add revision</button></div><div class="card"><div id="revisionList"></div></div></section>
-<section id="mocks" class="page"><div class="sectionIntro"><div><h2>Mock tests</h2><p>Record scores and build your trend.</p></div><button class="primary" id="addMock">＋ Add mock</button></div><div class="card"><div id="mockList"></div></div></section>
-<section id="mistakes" class="page"><div class="sectionIntro"><div><h2>Mistake book</h2><p>Capture why the question went wrong.</p></div><button class="primary" id="addMistake">＋ Add mistake</button></div><div class="card"><div id="mistakeList"></div></div></section>
-<section id="analytics" class="page"><div class="sectionIntro"><div><h2>Analytics</h2><p>Subject and workflow completion.</p></div></div><div class="grid three" id="analyticsGrid"></div><div class="card"><h3>Workflow completion</h3><div id="workflowAnalytics"></div></div></section>
-<section id="focus" class="page"><div class="focusWrap"><div class="card timer"><span class="pill">FOCUS MODE</span><div id="timer">50:00</div><p>50 minutes focus</p><button class="primary" id="timerBtn">Start</button> <button class="ghost" id="resetTimer">Reset</button></div><div class="card"><h3>Focus rule</h3><p>One task. One chapter. No switching until the timer ends.</p></div></div></section>
-</main></div><div class="modal" id="modal"><div class="modalBox"><button class="close" id="closeModal">×</button><h3 id="modalTitle">Add</h3><form id="modalForm"></form></div></div><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEETOS V2.2</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div>
+    <div class="brand">NEETOS</div>
+    <div class="sub">Mock Intelligence • V2.2</div>
+  </div>
+  <button id="themeBtn" class="iconbtn">☀️</button>
+</header>
+
+<nav class="tabs">
+  <button data-tab="dashboard" class="active">Dashboard</button>
+  <button data-tab="mocks">Mocks</button>
+  <button data-tab="syllabus">Syllabus</button>
+  <button data-tab="mistakes">Mistakes</button>
+</nav>
+
+<main>
+<section id="dashboard" class="page active">
+  <div class="hero">
+    <div><span class="eyebrow">TODAY'S COMMAND</span><h1 id="command">Add your first mock to activate Mock Intelligence.</h1></div>
+    <button class="primary" onclick="showTab('mocks');scrollToForm()">+ Add Mock</button>
+  </div>
+
+  <div class="grid four">
+    <div class="card stat"><span>Latest Score</span><strong id="latestScore">—</strong><small>/ 720</small></div>
+    <div class="card stat"><span>Accuracy</span><strong id="accuracy">—</strong><small id="attemptInfo">No mock yet</small></div>
+    <div class="card stat"><span>Best Score</span><strong id="bestScore">—</strong><small>/ 720</small></div>
+    <div class="card stat"><span>Mocks</span><strong id="mockCount">0</strong><small>completed</small></div>
+  </div>
+
+  <div class="grid two">
+    <div class="card">
+      <div class="cardhead"><h2>📈 Score Trend</h2><span id="trendText"></span></div>
+      <div id="chart" class="chart empty">Add mocks to see your trend.</div>
+    </div>
+    <div class="card">
+      <div class="cardhead"><h2>🎯 What should I study now?</h2></div>
+      <div id="recommendation" class="recommendation">Your next action will appear here after mock analysis.</div>
+      <button class="secondary full" onclick="showTab('mocks')">Open Mock Analysis</button>
+    </div>
+  </div>
+
+  <div class="grid two">
+    <div class="card">
+      <div class="cardhead"><h2>📚 Subject Analysis</h2></div>
+      <div id="subjectBars"></div>
+    </div>
+    <div class="card">
+      <div class="cardhead"><h2>⏳ Next Mock</h2></div>
+      <div id="countdown" class="countdown">No date set</div>
+      <input id="nextMockDate" type="datetime-local">
+      <button class="secondary full" onclick="saveCountdown()">Save Countdown</button>
+    </div>
+  </div>
+</section>
+
+<section id="mocks" class="page">
+  <div class="sectiontitle"><div><span class="eyebrow">MOCK INTELLIGENCE</span><h1>Mock Manager</h1></div></div>
+  <div class="card formcard" id="mockFormCard">
+    <h2>➕ Add Mock Result</h2>
+    <div class="formgrid">
+      <label>Mock name<input id="mName" placeholder="Mock 04"></label>
+      <label>Date<input id="mDate" type="date"></label>
+      <label>Physics marks<input id="mPhy" type="number" min="0" max="180" placeholder="0"></label>
+      <label>Chemistry marks<input id="mChem" type="number" min="0" max="180" placeholder="0"></label>
+      <label>Biology marks<input id="mBio" type="number" min="0" max="360" placeholder="0"></label>
+      <label>Correct<input id="mCorrect" type="number" min="0" placeholder="0"></label>
+      <label>Wrong<input id="mWrong" type="number" min="0" placeholder="0"></label>
+      <label>Unattempted<input id="mUnattempted" type="number" min="0" placeholder="0"></label>
+      <label>Primary mistake type
+        <select id="mMistake"><option>Conceptual</option><option>Calculation</option><option>Memory</option><option>Silly</option><option>Misread</option></select>
+      </label>
+      <label>Weak chapter / topic<input id="mWeak" placeholder="e.g. Current Electricity"></label>
+    </div>
+    <div class="preview"><b>Total:</b> <span id="formTotal">0</span>/720 &nbsp; <b>Accuracy:</b> <span id="formAcc">—</span></div>
+    <button class="primary" onclick="addMock()">Save Mock</button>
+    <p class="hint">Marks can be entered directly. Correct/wrong/unattempted are used for accuracy and mistake analysis.</p>
+  </div>
+  <div class="card">
+    <div class="cardhead"><h2>Mock History</h2><button class="secondary" onclick="clearMocks()">Clear All</button></div>
+    <div id="mockList" class="list"></div>
+  </div>
+</section>
+
+<section id="syllabus" class="page">
+  <div class="sectiontitle"><div><span class="eyebrow">SMART SYLLABUS</span><h1>Chapter Progress</h1></div></div>
+  <div class="card">
+    <p class="hint">Use this alongside V2.1. V2.2 reads your existing NEETOS V2.1 syllabus data when available.</p>
+    <div id="syllabusStats"></div>
+    <div id="syllabusList"></div>
+  </div>
+</section>
+
+<section id="mistakes" class="page">
+  <div class="sectiontitle"><div><span class="eyebrow">MISTAKE INTELLIGENCE</span><h1>Mistake Patterns</h1></div></div>
+  <div class="grid two">
+    <div class="card"><h2>Type breakdown</h2><div id="mistakeTypes"></div></div>
+    <div class="card"><h2>Weak chapters from mocks</h2><div id="weakTopics"></div></div>
+  </div>
+</section>
+</main>
+
+<footer>NEETOS V2.2 • Data stays in your browser (localStorage).</footer>
+<script src="app.js"></script>
+</body>
+</html>

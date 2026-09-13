@@ -1,38 +1,117 @@
-const KEY="neetos_v21";
-const CHAPTERS={"Physics": ["Physics and Measurement", "Kinematics", "Laws of Motion", "Work, Energy and Power", "Rotational Motion", "Gravitation", "Properties of Solids and Liquids", "Thermodynamics", "Kinetic Theory of Gases", "Oscillations and Waves", "Electrostatics", "Current Electricity", "Magnetic Effects of Current and Magnetism", "Electromagnetic Induction and Alternating Currents", "Electromagnetic Waves", "Optics", "Dual Nature of Matter and Radiation", "Atoms and Nuclei", "Electronic Devices", "Experimental Skills"], "Chemistry": ["Some Basic Principles of Chemistry", "Atomic Structure", "Chemical Bonding and Molecular Structure", "Chemical Thermodynamics", "Solutions", "Equilibrium", "Redox Reactions and Electrochemistry", "Chemical Kinetics", "Classification of Elements and Periodicity", "p-Block Elements", "d- and f-Block Elements", "Coordination Compounds", "Purification and Characterisation of Organic Compounds", "Basic Principles of Organic Chemistry", "Hydrocarbons", "Organic Compounds Containing Halogens", "Organic Compounds Containing Oxygen", "Organic Compounds Containing Nitrogen", "Biomolecules", "Principles Related to Practical Chemistry"], "Biology": ["Diversity in Living World", "Structural Organisation in Plants and Animals", "Cell Structure and Function", "Plant Physiology", "Human Physiology", "Reproduction", "Genetics and Evolution", "Ecology and Environment", "Biology and Human Welfare", "Biotechnology and Its Applications", "Animal Kingdom", "Animal Tissues and Structural Organisation", "Human Health and Disease"]};
-const STEPS=["Lecture","DPP","Module","PYQ","Revision"];
-let seed=[];let id=1;
-for(const subject of Object.keys(CHAPTERS)) for(const name of CHAPTERS[subject]) seed.push({id:id++,subject,name,steps:Object.fromEntries(STEPS.map(s=>[s,false]))});
-const data=JSON.parse(localStorage.getItem(KEY)||"null")||{chapters:seed,tasks:[],revisions:[],mocks:[],mistakes:[]};
-const save=()=>localStorage.setItem(KEY,JSON.stringify(data)), $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-const today=()=>new Date().toISOString().slice(0,10);
-const datePlus=n=>{let d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
-const pct=c=>Math.round(Object.values(c.steps).filter(Boolean).length/5*100);
-const overall=()=>Math.round(data.chapters.reduce((a,c)=>a+pct(c),0)/data.chapters.length)||0;
-function showPage(id){$$(".page").forEach(p=>p.classList.toggle("active",p.id===id));$$(".nav").forEach(n=>n.classList.toggle("active",n.dataset.page===id));$("#pageTitle").textContent=id==="dashboard"?"Dashboard":id[0].toUpperCase()+id.slice(1);render()}
-$$(".nav").forEach(b=>b.onclick=()=>showPage(b.dataset.page));$$("[data-go]").forEach(b=>b.onclick=()=>showPage(b.dataset.go));
-function empty(t){return `<div class="empty">${esc(t)}</div>`}
-function migrate(){let old=localStorage.getItem("neetos_v2");if(!old||localStorage.getItem("v21m"))return;try{let o=JSON.parse(old);data.tasks=o.tasks||[];data.revisions=o.revisions||[];data.mocks=o.mocks||[];data.mistakes=o.mistakes||[];if(o.chapters)o.chapters.forEach(oc=>{let c=data.chapters.find(x=>x.name.toLowerCase().includes(oc.name.toLowerCase())||oc.name.toLowerCase().includes(x.name.toLowerCase()));if(c){let n=Math.round((oc.progress||0)/20);STEPS.slice(0,n).forEach(s=>c.steps[s]=true)}});localStorage.setItem("v21m","1");save()}catch(e){}}
-migrate();
-function toggleStep(id,s){let c=data.chapters.find(x=>x.id===id);if(!c)return;c.steps[s]=!c.steps[s];if(c.steps[s]&&s==="Revision")addRevisionCycle(c);save();render()}
-function addRevisionCycle(c){let open=data.revisions.find(r=>r.chapterId===c.id&&!r.done);if(open)return;let count=data.revisions.filter(r=>r.chapterId===c.id).length;let offset=[1,3,7,15,30][Math.min(count,4)];data.revisions.push({id:Date.now()+Math.random(),title:c.name+" revision",subject:c.subject,date:datePlus(offset),done:false,chapterId:c.id,auto:true})}
-function autoTasks(){let open=new Set(data.tasks.filter(t=>!t.done&&t.auto).map(t=>t.chapterId+"|"+t.step));let candidates=[];for(const c of data.chapters){let s=STEPS.find(x=>!c.steps[x]);if(s&&!open.has(c.id+"|"+s))candidates.push({c,s})}candidates.sort((a,b)=>pct(a.c)-pct(b.c));for(const x of candidates.slice(0,6))data.tasks.push({id:Date.now()+Math.random(),title:x.s+" — "+x.c.name,subject:x.c.subject,done:false,auto:true,chapterId:x.c.id,step:x.s})}
-function recommendation(){let r=data.revisions.find(x=>!x.done&&x.date<=today());if(r)return["Revise now",r.subject+" • "+r.title+" is due."];let t=data.tasks.find(x=>!x.done);if(t)return["Next best task",t.title+" — "+t.subject+"."];let c=data.chapters.find(x=>pct(x)<100);if(c)return["Build the next chapter",c.subject+" • "+c.name+" — "+STEPS.find(s=>!c.steps[s])+" is pending."];return["Everything is complete","Add your next mock or revision target."]}
-function taskHTML(t){return `<div class="task ${t.done?"done":""}"><input type="checkbox" ${t.done?"checked":""} onchange="toggleTask(${t.id})"><div><div class="taskTitle">${esc(t.title)}</div><div class="meta">${esc(t.subject||"General")}${t.auto?" • NEETOS AUTO":""}</div></div></div>`}
-function toggleTask(id){let t=data.tasks.find(x=>x.id===id);if(t)t.done=!t.done;save();render()}
-window.toggleTask=toggleTask;window.toggleStep=toggleStep;
-function renderSyllabus(){let f=$("#subjectFilter").value;$("#syllabusList").innerHTML=data.chapters.filter(c=>f==="All"||c.subject===f).map(c=>`<div class="chapter"><div class="chapterTop"><div><span class="subject">${esc(c.subject)}</span><strong>${esc(c.name)}</strong><div class="meta">${pct(c)}% complete</div></div><b>${pct(c)}%</b></div><div class="steps">${STEPS.map(s=>`<button class="step ${c.steps[s]?"done":""}" onclick="toggleStep(${c.id},'${s}')">${s} ${c.steps[s]?"✓":""}</button>`).join("")}</div></div>`).join("")}
-function renderRevisions(){$("#revisionList").innerHTML=data.revisions.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(r=>`<div class="revision"><b>${esc(r.title)}</b><div class="meta">${esc(r.subject)} • ${esc(r.date)} ${r.date<=today()&&!r.done?"• DUE":""}</div><button class="ghost" onclick="toggleRevision(${r.id})">${r.done?"Mark pending":"Mark done"}</button></div>`).join("")||empty("No revisions yet. Mark a chapter's Revision step.")}
-function toggleRevision(id){let r=data.revisions.find(x=>x.id===id);if(!r)return;r.done=!r.done;if(r.done&&r.auto){let c=data.chapters.find(x=>x.id===r.chapterId);if(c)addRevisionCycle(c)}save();render()}
-window.toggleRevision=toggleRevision;
-function render(){autoTasks();let o=overall();$("#overall").textContent=o+"%";$("#overallBar").style.width=o+"%";let wf=Math.round(data.chapters.reduce((a,c)=>a+Object.values(c.steps).filter(Boolean).length,0)/(data.chapters.length*5)*100);$("#workflowPct").textContent=wf+"%";$("#todayDue").textContent=data.revisions.filter(r=>!r.done&&r.date<=today()).length+data.tasks.filter(t=>!t.done).length;let scores=data.mocks.map(x=>+x.score);$("#mockAvg").textContent=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):"—";let rec=recommendation();$("#heroTitle").textContent=rec[0];$("#heroText").textContent=rec[1];$("#dashTasks").innerHTML=data.tasks.filter(t=>!t.done).slice(0,6).map(taskHTML).join("")||empty("No pending tasks.");let c=data.chapters.find(x=>pct(x)<100);$("#dashWorkflow").innerHTML=c?`<span class="subject">${esc(c.subject)}</span><h3>${esc(c.name)}</h3><div class="steps">${STEPS.map(s=>`<button class="step ${c.steps[s]?"done":""}" onclick="toggleStep(${c.id},'${s}')">${s}</button>`).join("")}</div>`:empty("All workflows complete.");renderSyllabus();$("#taskList").innerHTML=data.tasks.filter(t=>!t.done).map(taskHTML).join("")||empty("No pending tasks.");renderRevisions();$("#mockList").innerHTML=data.mocks.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(m=>`<div class="mock"><b>${esc(m.name)}</b><div class="meta">${esc(m.date)} • <b>${esc(m.score)}/720</b></div></div>`).join("")||empty("No mocks yet.");$("#mistakeList").innerHTML=data.mistakes.slice().reverse().map(m=>`<div class="mistake"><b>${esc(m.question)}</b><div class="meta">${esc(m.subject)} • ${esc(m.type)} • ${esc(m.reason)}</div></div>`).join("")||empty("Your mistake book is empty.");renderAnalytics()}
-function renderAnalytics(){let subs=["Physics","Chemistry","Biology"];$("#analyticsGrid").innerHTML=subs.map(s=>{let a=data.chapters.filter(c=>c.subject===s),p=Math.round(a.reduce((x,c)=>x+pct(c),0)/a.length);return `<div class="card stat"><span>${s}</span><strong>${p}%</strong><div class="bar"><i style="width:${p}%"></i></div></div>`}).join("");$("#workflowAnalytics").innerHTML=STEPS.map(s=>{let p=Math.round(data.chapters.filter(c=>c.steps[s]).length/data.chapters.length*100);return `<div style="margin:13px 0"><div class="chapterTop"><b>${s}</b><span>${p}%</span></div><div class="smallbar"><i style="width:${p}%"></i></div></div>`}).join("")}
-$("#subjectFilter").onchange=renderSyllabus;
-function modal(title,fields,saveFn){$("#modalTitle").textContent=title;$("#modalForm").innerHTML=fields.map(f=>`<div class="formRow"><label>${f.label}</label>${f.html}</div>`).join("")+`<div class="formActions"><button class="primary">Save</button></div>`;$("#modal").classList.add("show");$("#modalForm").onsubmit=e=>{e.preventDefault();saveFn(new FormData(e.target));$("#modal").classList.remove("show");save();render()}}
-function taskModal(){modal("Add task",[{label:"Task",html:'<input name="title" required>'},{label:"Subject",html:'<select name="subject"><option>Physics</option><option>Chemistry</option><option>Biology</option><option>General</option></select>'}],f=>data.tasks.push({id:Date.now(),title:f.get("title"),subject:f.get("subject"),done:false,auto:false}))}
-function revModal(){modal("Schedule revision",[{label:"Topic",html:'<input name="title" required>'},{label:"Subject",html:'<select name="subject"><option>Physics</option><option>Chemistry</option><option>Biology</option></select>'},{label:"Date",html:'<input type="date" name="date" value="'+today()+'" required>'}],f=>data.revisions.push({id:Date.now(),title:f.get("title"),subject:f.get("subject"),date:f.get("date"),done:false,auto:false}))}
-function mockModal(){modal("Add mock",[{label:"Name",html:'<input name="name" required>'},{label:"Date",html:'<input type="date" name="date" value="'+today()+'" required>'},{label:"Score / 720",html:'<input type="number" name="score" min="0" max="720" required>'}],f=>data.mocks.push({id:Date.now(),name:f.get("name"),date:f.get("date"),score:f.get("score")}))}
-function mistakeModal(){modal("Add mistake",[{label:"Question/topic",html:'<input name="question" required>'},{label:"Subject",html:'<select name="subject"><option>Physics</option><option>Chemistry</option><option>Biology</option></select>'},{label:"Type",html:'<select name="type"><option>Conceptual</option><option>Calculation</option><option>Memory</option><option>Silly</option><option>Misread</option></select>'},{label:"Reason",html:'<input name="reason" required>'}],f=>data.mistakes.push({id:Date.now(),question:f.get("question"),subject:f.get("subject"),type:f.get("type"),reason:f.get("reason")}))}
-$("#quickAdd").onclick=taskModal;$("#addTask").onclick=taskModal;$("#addRevision").onclick=revModal;$("#addMock").onclick=mockModal;$("#addMistake").onclick=mistakeModal;$("#nextTaskBtn").onclick=()=>alert(recommendation().join(" — "));$("#closeModal").onclick=()=>$("#modal").classList.remove("show");$("#modal").onclick=e=>{if(e.target.id==="modal")$("#modal").classList.remove("show")};
-let rem=3000,run=false,intv=null;function draw(){let m=String(Math.floor(rem/60)).padStart(2,"0"),s=String(rem%60).padStart(2,"0");$("#timer").textContent=m+":"+s}$("#timerBtn").onclick=()=>{if(run){clearInterval(intv);run=false;$("#timerBtn").textContent="Start"}else{run=true;$("#timerBtn").textContent="Pause";intv=setInterval(()=>{rem--;draw();if(rem<=0){clearInterval(intv);run=false;alert("Focus session complete!");rem=3000;draw();$("#timerBtn").textContent="Start"}},1000)}};$("#resetTimer").onclick=()=>{clearInterval(intv);run=false;rem=3000;draw();$("#timerBtn").textContent="Start"};draw();render();
+const KEY="neetos_v22";
+const OLD="neetos_v21";
+let state=load();
+
+function load(){
+  try{
+    const s=JSON.parse(localStorage.getItem(KEY)||"null");
+    if(s) return s;
+    const old=JSON.parse(localStorage.getItem(OLD)||"null");
+    return {mocks:[],nextMock:"",syllabus:old?.syllabus||[],theme:old?.theme||"light"};
+  }catch(e){return {mocks:[],nextMock:"",syllabus:[],theme:"light"}}
+}
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function esc(x){return String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function showTab(id){
+ document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+ document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("active",x.dataset.tab===id));
+ document.getElementById(id).classList.add("active"); render();
+}
+function scrollToForm(){setTimeout(()=>document.getElementById("mockFormCard")?.scrollIntoView({behavior:"smooth"}),80)}
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+
+function num(id){return Number(document.getElementById(id).value||0)}
+function updatePreview(){
+ const total=num("mPhy")+num("mChem")+num("mBio"), c=num("mCorrect"),w=num("mWrong"),a=c+w;
+ document.getElementById("formTotal").textContent=total;
+ document.getElementById("formAcc").textContent=a?((c/a)*100).toFixed(1)+"%":"—";
+}
+["mPhy","mChem","mBio","mCorrect","mWrong","mUnattempted"].forEach(id=>document.getElementById(id).addEventListener("input",updatePreview));
+
+function addMock(){
+ const name=document.getElementById("mName").value.trim()||`Mock ${state.mocks.length+1}`;
+ const date=document.getElementById("mDate").value||new Date().toISOString().slice(0,10);
+ const phy=num("mPhy"),chem=num("mChem"),bio=num("mBio"),correct=num("mCorrect"),wrong=num("mWrong"),un=num("mUnattempted");
+ if(phy>180||chem>180||bio>360||phy<0||chem<0||bio<0){alert("Subject marks limit check karo.");return}
+ if(correct+wrong+un>180){alert("Correct + Wrong + Unattempted 180 se zyada nahi ho sakta.");return}
+ state.mocks.push({id:Date.now(),name,date,phy,chem,bio,correct,wrong,un,mistake:document.getElementById("mMistake").value,weak:document.getElementById("mWeak").value.trim()});
+ save(); document.querySelectorAll("#mockFormCard input").forEach(x=>x.value=""); updatePreview(); render();
+ alert("Mock saved! NEETOS ne analysis kar diya.");
+}
+function total(m){return m.phy+m.chem+m.bio}
+function acc(m){const a=m.correct+m.wrong;return a?(m.correct/a*100):null}
+function clearMocks(){if(confirm("Saare mock results delete karein?")){state.mocks=[];save();render()}}
+function latest(){return state.mocks[state.mocks.length-1]}
+
+function render(){
+ document.body.classList.toggle("dark",state.theme==="dark");
+ const ms=state.mocks;
+ const l=latest();
+ document.getElementById("latestScore").textContent=l?total(l):"—";
+ document.getElementById("bestScore").textContent=ms.length?Math.max(...ms.map(total)):"—";
+ document.getElementById("mockCount").textContent=ms.length;
+ document.getElementById("accuracy").textContent=l&&acc(l)!=null?acc(l).toFixed(1)+"%":"—";
+ document.getElementById("attemptInfo").textContent=l?`${l.correct+l.wrong} attempted`:"No mock yet";
+ document.getElementById("command").textContent=makeCommand();
+ renderChart(); renderRecommendation(); renderSubjects(); renderMocks(); renderMistakes(); renderSyllabus(); renderCountdown();
+}
+function makeCommand(){
+ const l=latest(); if(!l)return"Add your first mock to activate Mock Intelligence.";
+ const weak=weakSubject(l), topic=l.weak||"your lowest-progress chapter";
+ return `Latest ${total(l)}/720 • Focus next on ${weak}. Start with ${topic}.`;
+}
+function weakSubject(m){
+ const arr=[["Physics",m.phy],["Chemistry",m.chem],["Biology",m.bio]];
+ return arr.sort((a,b)=>(a[1]/(a[0]=="Biology"?360:180))-(b[1]/(b[0]=="Biology"?360:180)))[0][0];
+}
+function renderChart(){
+ const el=document.getElementById("chart"); const ms=state.mocks;
+ if(!ms.length){el.className="chart empty";el.textContent="Add mocks to see your trend.";return}
+ el.className="chart";el.innerHTML="";
+ ms.slice(-10).forEach(m=>{const w=Math.max(3,total(m)/720*150);el.insertAdjacentHTML("beforeend",`<div class="barwrap"><span class="bartop" style="--h:${w}px">${total(m)}</span><div class="bar" style="height:${w}px"></div><span class="barlabel">${esc(m.name)}</span></div>`)});
+ const trend=ms.length>1?total(ms.at(-1))-total(ms.at(-2)):0;
+ document.getElementById("trendText").textContent=ms.length>1?(trend>=0?`+${trend}`:`${trend}`)+" vs previous":"";
+}
+function renderRecommendation(){
+ const el=document.getElementById("recommendation"),l=latest();
+ if(!l){el.textContent="Mock complete karne ke baad yahan exact next-study recommendation milegi.";return}
+ const s=weakSubject(l), t=l.weak?`“${esc(l.weak)}”`:"your lowest-progress chapter";
+ const type=l.mistake;
+ let action= type==="Conceptual"?"notes + class questions":type==="Calculation"?"10–20 numerical questions":type==="Memory"?"NCERT active recall":type==="Silly"?"timed MCQ practice + error check":"slow reading + question-stem practice";
+ el.innerHTML=`<b>Priority #1: ${s}</b><br>Chapter: ${t}<br><br>Because your latest mock shows ${type.toLowerCase()} mistakes, do <b>${action}</b> first. Then revise the chapter and attempt PYQs.`;
+}
+function renderSubjects(){
+ const el=document.getElementById("subjectBars"),l=latest();
+ if(!l){el.innerHTML='<div class="emptybox">No mock data yet.</div>';return}
+ const data=[["Physics",l.phy,180],["Chemistry",l.chem,180],["Biology",l.bio,360]];
+ el.innerHTML=data.map(([n,v,max])=>`<div class="subject"><div class="subjecthead"><b>${n}</b><span>${v}/${max} • ${(v/max*100).toFixed(0)}%</span></div><div class="track"><div class="fill" style="width:${Math.min(100,v/max*100)}%"></div></div></div>`).join("");
+}
+function renderMocks(){
+ const el=document.getElementById("mockList"),ms=[...state.mocks].reverse();
+ if(!ms.length){el.innerHTML='<div class="emptybox">No mocks saved yet.</div>';return}
+ el.innerHTML=ms.map(m=>`<div class="listitem"><div class="mockrow"><div><b>${esc(m.name)}</b><div class="mini">${esc(m.date)} • ${m.correct+m.wrong} attempted</div></div><div class="score">${total(m)}/720</div></div><div><span class="pill">P ${m.phy}/180</span><span class="pill">C ${m.chem}/180</span><span class="pill">B ${m.bio}/360</span>${acc(m)!=null?`<span class="pill">${acc(m).toFixed(1)}% accuracy</span>`:""}<span class="pill">${esc(m.mistake)}</span>${m.weak?`<span class="pill">${esc(m.weak)}</span>`:""}</div></div>`).join("");
+}
+function renderMistakes(){
+ const types={},topics={}; state.mocks.forEach(m=>{types[m.mistake]=(types[m.mistake]||0)+1;if(m.weak)topics[m.weak]=(topics[m.weak]||0)+1});
+ document.getElementById("mistakeTypes").innerHTML=Object.keys(types).length?Object.entries(types).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="subject"><div class="subjecthead"><b>${esc(k)}</b><span>${v} mock(s)</span></div><div class="track"><div class="fill" style="width:${v/state.mocks.length*100}%"></div></div></div>`).join(""):'<div class="emptybox">No mistake data yet.</div>';
+ document.getElementById("weakTopics").innerHTML=Object.keys(topics).length?Object.entries(topics).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<span class="pill">🔴 ${esc(k)} ×${v}</span>`).join(" "):'<div class="emptybox">Mock add karte waqt weak chapter likho.</div>';
+}
+function renderSyllabus(){
+ const el=document.getElementById("syllabusList"), stats=document.getElementById("syllabusStats"), arr=Array.isArray(state.syllabus)?state.syllabus:[];
+ if(!arr.length){stats.innerHTML="";el.innerHTML='<div class="emptybox">V2.1 syllabus data nahi mila. V2.2 mocks phir bhi fully work karega.</div>';return}
+ const done=arr.filter(x=>x.progress===100||x.completed).length; stats.innerHTML=`<p><b>${done}/${arr.length}</b> tracked items completed</p>`;
+ el.innerHTML=arr.slice(0,60).map(x=>{const p=x.progress??(x.completed?100:0);return `<div class="subject"><div class="subjecthead"><b>${esc(x.name||x.chapter||"Chapter")}</b><span>${p}%</span></div><div class="track"><div class="fill" style="width:${p}%"></div></div></div>`}).join("");
+}
+function renderCountdown(){
+ const input=document.getElementById("nextMockDate"); input.value=state.nextMock||"";
+ const el=document.getElementById("countdown");
+ if(!state.nextMock){el.textContent="No date set";return}
+ const diff=new Date(state.nextMock)-new Date();
+ if(diff<=0){el.innerHTML="🔥 Mock time!";return}
+ const d=Math.floor(diff/86400000),h=Math.floor(diff%86400000/3600000),m=Math.floor(diff%3600000/60000);
+ el.innerHTML=`${d}d ${h}h ${m}m <small>remaining</small>`;
+}
+function saveCountdown(){state.nextMock=document.getElementById("nextMockDate").value;save();renderCountdown()}
+document.getElementById("themeBtn").onclick=()=>{state.theme=state.theme==="dark"?"light":"dark";save();render()};
+setInterval(renderCountdown,60000);
+render(); updatePreview();
