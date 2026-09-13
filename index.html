@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>NEET Command Center</title>
+  <meta name="theme-color" content="#0b1220">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><span>🧬</span><div><b>NEET</b><small>COMMAND CENTER</small></div></div>
+    <nav>
+      <button class="nav active" data-page="dashboard">🏠 <span>Dashboard</span></button>
+      <button class="nav" data-page="syllabus">📚 <span>Syllabus</span></button>
+      <button class="nav" data-page="planner">🎯 <span>Today's Plan</span></button>
+      <button class="nav" data-page="revision">🧠 <span>Revision</span></button>
+      <button class="nav" data-page="mocks">📝 <span>Mock Tests</span></button>
+      <button class="nav" data-page="mistakes">❌ <span>Mistake Book</span></button>
+      <button class="nav" data-page="analytics">📊 <span>Analytics</span></button>
+    </nav>
+    <div class="side-note">NEET 2027<br><small>Built for focused preparation.</small></div>
+  </aside>
+
+  <main>
+    <header>
+      <button id="menu" class="mobile-menu">☰</button>
+      <div><p class="eyebrow">NEET 2027 • COMMAND CENTER</p><h1 id="pageTitle">Dashboard</h1></div>
+      <div class="header-actions"><button class="icon-btn" id="reset">↻</button><div class="avatar">N</div></div>
+    </header>
+
+    <section id="dashboard" class="page active-page">
+      <div class="hero">
+        <div><p class="muted">Good evening 👋</p><h2>Ready for your next task?</h2><p class="muted">No confusion. Just open this page and do the next highest-priority task.</p></div>
+        <button class="primary" onclick="showPage('planner')">🎯 What should I study now?</button>
+      </div>
+      <div class="stats">
+        <div class="card stat"><span>🔥 Streak</span><strong id="streak">1 day</strong><small>Keep the chain alive</small></div>
+        <div class="card stat"><span>📚 Syllabus</span><strong id="overall">0%</strong><small>Across all subjects</small></div>
+        <div class="card stat"><span>⏱️ Study today</span><strong id="studyTime">0h 00m</strong><small>Focus sessions</small></div>
+        <div class="card stat"><span>📝 Next mock</span><strong id="nextMock">—</strong><small id="mockSub">Add a mock test</small></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="card-head"><h3>Today's checklist</h3><button class="link" onclick="showPage('planner')">View all</button></div><div id="dashTasks"></div></div>
+        <div class="card"><div class="card-head"><h3>Subject progress</h3><button class="link" onclick="showPage('syllabus')">Manage</button></div><div id="subjectProgress"></div></div>
+      </div>
+    </section>
+
+    <section id="syllabus" class="page">
+      <div class="section-top"><div><p class="muted">Track the entire journey</p><h2>Syllabus Tracker</h2></div><button class="primary" onclick="addChapter()">＋ Add chapter</button></div>
+      <div class="filters"><button class="filter active" data-filter="All">All</button><button class="filter" data-filter="Physics">Physics</button><button class="filter" data-filter="Chemistry">Chemistry</button><button class="filter" data-filter="Biology">Biology</button></div>
+      <div id="chapters"></div>
+    </section>
+
+    <section id="planner" class="page">
+      <div class="section-top"><div><p class="muted">One task at a time</p><h2>Today's Plan</h2></div><button class="primary" onclick="addTask()">＋ Add task</button></div>
+      <div class="focus-box card"><div><span class="pulse"></span><div><b id="nextTaskTitle">No task yet</b><small id="nextTaskReason">Add your study tasks below.</small></div><button class="primary" onclick="startFocus()">Start 50 min focus</button></div></div>
+      <div class="card"><div id="tasks"></div></div>
+    </section>
+
+    <section id="revision" class="page">
+      <div class="section-top"><div><p class="muted">Never let completed chapters fade</p><h2>Revision Queue</h2></div></div>
+      <div class="info card">💡 After completing a chapter, schedule revisions at <b>1 → 3 → 7 → 15 → 30 days</b>. This V1 lets you add and complete revision items quickly.</div>
+      <div class="card"><div id="revisions"></div></div>
+    </section>
+
+    <section id="mocks" class="page">
+      <div class="section-top"><div><p class="muted">Measure improvement, not ego</p><h2>Mock Tests</h2></div><button class="primary" onclick="addMock()">＋ Add mock</button></div>
+      <div id="mockCards"></div>
+    </section>
+
+    <section id="mistakes" class="page">
+      <div class="section-top"><div><p class="muted">Turn mistakes into marks</p><h2>Mistake Book</h2></div><button class="primary" onclick="addMistake()">＋ Add mistake</button></div>
+      <div class="filters"><button class="filter active" data-mtype="All">All</button><button class="filter" data-mtype="Concept">Concept</button><button class="filter" data-mtype="Silly">Silly</button><button class="filter" data-mtype="Calculation">Calculation</button></div>
+      <div class="card"><div id="mistakeList"></div></div>
+    </section>
+
+    <section id="analytics" class="page">
+      <div class="section-top"><div><p class="muted">Know exactly where you stand</p><h2>Analytics</h2></div></div>
+      <div class="stats" id="analyticsStats"></div>
+      <div class="card"><h3>How the score works</h3><p class="muted">V1 tracks completion, tasks, revisions, mocks and mistakes locally on your device. Cloud sync and AI planning can be added in the next version.</p></div>
+    </section>
+  </main>
+
+  <div id="toast"></div>
+  <div id="timer" class="timer hidden"><div class="timer-box"><span>FOCUS SESSION</span><strong id="timerText">50:00</strong><button class="primary" onclick="stopFocus()">End session</button></div></div>
+  <script src="app.js"></script>
+</body>
+</html>
