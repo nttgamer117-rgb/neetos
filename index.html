@@ -3,112 +3,110 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NEETOS V2.2</title>
+<title>NEETOS V3</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="top">
-  <div>
-    <div class="brand">NEETOS</div>
-    <div class="sub">Mock Intelligence • V2.2</div>
-  </div>
+  <div><div class="brand">NEETOS</div><div class="sub">AI Mentor • Cloud • Schedule Import • V3</div></div>
   <button id="themeBtn" class="iconbtn">☀️</button>
 </header>
-
 <nav class="tabs">
   <button data-tab="dashboard" class="active">Dashboard</button>
+  <button data-tab="mentor">AI Mentor</button>
+  <button data-tab="schedule">Schedule</button>
   <button data-tab="mocks">Mocks</button>
-  <button data-tab="syllabus">Syllabus</button>
-  <button data-tab="mistakes">Mistakes</button>
+  <button data-tab="settings">Cloud</button>
 </nav>
-
 <main>
 <section id="dashboard" class="page active">
-  <div class="hero">
-    <div><span class="eyebrow">TODAY'S COMMAND</span><h1 id="command">Add your first mock to activate Mock Intelligence.</h1></div>
-    <button class="primary" onclick="showTab('mocks');scrollToForm()">+ Add Mock</button>
-  </div>
-
+  <div class="hero"><div><span class="eyebrow">NEETOS V3</span><h1 id="command">Your NEET command center.</h1><p id="subcommand">Study smarter. Track everything.</p></div><button class="primary" onclick="showTab('mentor')">Ask Mentor →</button></div>
   <div class="grid four">
-    <div class="card stat"><span>Latest Score</span><strong id="latestScore">—</strong><small>/ 720</small></div>
-    <div class="card stat"><span>Accuracy</span><strong id="accuracy">—</strong><small id="attemptInfo">No mock yet</small></div>
-    <div class="card stat"><span>Best Score</span><strong id="bestScore">—</strong><small>/ 720</small></div>
-    <div class="card stat"><span>Mocks</span><strong id="mockCount">0</strong><small>completed</small></div>
+    <div class="card stat"><span>Latest Score</span><strong id="latestScore">—</strong><small>/720</small></div>
+    <div class="card stat"><span>Best Score</span><strong id="bestScore">—</strong><small>/720</small></div>
+    <div class="card stat"><span>Accuracy</span><strong id="accuracy">—</strong></div>
+    <div class="card stat"><span>Readiness</span><strong id="readiness">—</strong><small>/100</small></div>
   </div>
-
   <div class="grid two">
-    <div class="card">
-      <div class="cardhead"><h2>📈 Score Trend</h2><span id="trendText"></span></div>
-      <div id="chart" class="chart empty">Add mocks to see your trend.</div>
-    </div>
-    <div class="card">
-      <div class="cardhead"><h2>🎯 What should I study now?</h2></div>
-      <div id="recommendation" class="recommendation">Your next action will appear here after mock analysis.</div>
-      <button class="secondary full" onclick="showTab('mocks')">Open Mock Analysis</button>
-    </div>
+    <div class="card"><div class="cardhead"><h2>🧠 Today's AI plan</h2></div><div id="todayPlan" class="plan"></div></div>
+    <div class="card"><div class="cardhead"><h2>⏳ Next Mock</h2></div><div id="countdown" class="countdown">No date set</div><input id="nextMockDate" type="datetime-local"><button class="secondary full" onclick="saveCountdown()">Save Countdown</button></div>
   </div>
-
   <div class="grid two">
-    <div class="card">
-      <div class="cardhead"><h2>📚 Subject Analysis</h2></div>
-      <div id="subjectBars"></div>
+    <div class="card"><h2>📈 Score Trend</h2><div id="chart" class="chart empty">Add mocks to see trend.</div></div>
+    <div class="card"><h2>🎯 Subject Strength</h2><div id="subjects"></div></div>
+  </div>
+</section>
+
+<section id="mentor" class="page">
+  <div class="sectiontitle"><span class="eyebrow">PERSONAL STUDY MENTOR</span><h1>Ask NEETOS</h1></div>
+  <div class="card mentorbox">
+    <div class="suggestions">
+      <button onclick="ask('What should I study now?')">What should I study now?</button>
+      <button onclick="ask('Why is my score low?')">Why is my score low?</button>
+      <button onclick="ask('How should I revise?')">How should I revise?</button>
+      <button onclick="ask('What should I do before my next mock?')">Next mock strategy</button>
     </div>
-    <div class="card">
-      <div class="cardhead"><h2>⏳ Next Mock</h2></div>
-      <div id="countdown" class="countdown">No date set</div>
-      <input id="nextMockDate" type="datetime-local">
-      <button class="secondary full" onclick="saveCountdown()">Save Countdown</button>
-    </div>
+    <div id="chat" class="chat"><div class="bubble bot">Main NEETOS Mentor hoon. Tumhare mocks, syllabus aur schedule ko dekhkar practical next step dunga.</div></div>
+    <div class="askrow"><input id="question" placeholder="Ask anything about your NEET preparation…"><button class="primary darkbtn" onclick="ask()">Ask</button></div>
+    <p class="hint">V3 mentor is a free rule-based study coach. Real external AI API is not required for this version.</p>
+  </div>
+</section>
+
+<section id="schedule" class="page">
+  <div class="sectiontitle"><span class="eyebrow">SCHEDULE IMPORT</span><h1>PW / Study Schedule</h1></div>
+  <div class="card">
+    <h2>📥 Import CSV or JSON</h2>
+    <p class="hint">Export/copy your study schedule into a simple CSV or JSON file. NEETOS will store it locally. No PW password is ever needed.</p>
+    <input id="scheduleFile" type="file" accept=".csv,.json,text/csv,application/json">
+    <div id="importStatus" class="status"></div>
+  </div>
+  <div class="card">
+    <div class="cardhead"><h2>Today's schedule</h2><button class="secondary" onclick="clearSchedule()">Clear</button></div>
+    <div id="scheduleList"></div>
   </div>
 </section>
 
 <section id="mocks" class="page">
-  <div class="sectiontitle"><div><span class="eyebrow">MOCK INTELLIGENCE</span><h1>Mock Manager</h1></div></div>
-  <div class="card formcard" id="mockFormCard">
-    <h2>➕ Add Mock Result</h2>
+  <div class="sectiontitle"><span class="eyebrow">MOCK INTELLIGENCE</span><h1>Mock Results</h1></div>
+  <div class="card formcard">
     <div class="formgrid">
-      <label>Mock name<input id="mName" placeholder="Mock 04"></label>
+      <label>Mock name<input id="mName" placeholder="Mock 05"></label>
       <label>Date<input id="mDate" type="date"></label>
-      <label>Physics marks<input id="mPhy" type="number" min="0" max="180" placeholder="0"></label>
-      <label>Chemistry marks<input id="mChem" type="number" min="0" max="180" placeholder="0"></label>
-      <label>Biology marks<input id="mBio" type="number" min="0" max="360" placeholder="0"></label>
-      <label>Correct<input id="mCorrect" type="number" min="0" placeholder="0"></label>
-      <label>Wrong<input id="mWrong" type="number" min="0" placeholder="0"></label>
-      <label>Unattempted<input id="mUnattempted" type="number" min="0" placeholder="0"></label>
-      <label>Primary mistake type
-        <select id="mMistake"><option>Conceptual</option><option>Calculation</option><option>Memory</option><option>Silly</option><option>Misread</option></select>
-      </label>
-      <label>Weak chapter / topic<input id="mWeak" placeholder="e.g. Current Electricity"></label>
+      <label>Physics<input id="mPhy" type="number" min="0" max="180"></label>
+      <label>Chemistry<input id="mChem" type="number" min="0" max="180"></label>
+      <label>Biology<input id="mBio" type="number" min="0" max="360"></label>
+      <label>Correct<input id="mCorrect" type="number" min="0"></label>
+      <label>Wrong<input id="mWrong" type="number" min="0"></label>
+      <label>Unattempted<input id="mUnattempted" type="number" min="0"></label>
+      <label>Mistake type<select id="mMistake"><option>Conceptual</option><option>Calculation</option><option>Memory</option><option>Silly</option><option>Misread</option></select></label>
+      <label>Weak chapter<input id="mWeak" placeholder="e.g. Current Electricity"></label>
     </div>
     <div class="preview"><b>Total:</b> <span id="formTotal">0</span>/720 &nbsp; <b>Accuracy:</b> <span id="formAcc">—</span></div>
-    <button class="primary" onclick="addMock()">Save Mock</button>
-    <p class="hint">Marks can be entered directly. Correct/wrong/unattempted are used for accuracy and mistake analysis.</p>
+    <button class="primary darkbtn" onclick="addMock()">Save Mock</button>
   </div>
-  <div class="card">
-    <div class="cardhead"><h2>Mock History</h2><button class="secondary" onclick="clearMocks()">Clear All</button></div>
-    <div id="mockList" class="list"></div>
-  </div>
+  <div class="card"><div class="cardhead"><h2>History</h2><button class="secondary" onclick="clearMocks()">Clear All</button></div><div id="mockList"></div></div>
 </section>
 
-<section id="syllabus" class="page">
-  <div class="sectiontitle"><div><span class="eyebrow">SMART SYLLABUS</span><h1>Chapter Progress</h1></div></div>
+<section id="settings" class="page">
+  <div class="sectiontitle"><span class="eyebrow">CLOUD SYNC</span><h1>Backup & Settings</h1></div>
   <div class="card">
-    <p class="hint">Use this alongside V2.1. V2.2 reads your existing NEETOS V2.1 syllabus data when available.</p>
-    <div id="syllabusStats"></div>
-    <div id="syllabusList"></div>
+    <h2>☁️ Optional Supabase Cloud</h2>
+    <p class="hint">V3 works fully offline. For cloud sync, create your own Supabase project and paste its project URL + anon/publishable key here. Never enter a PW password or private/service-role key.</p>
+    <label>Supabase Project URL<input id="sbUrl" placeholder="https://your-project.supabase.co"></label>
+    <label>Supabase anon/publishable key<input id="sbKey" placeholder="Paste public anon/publishable key"></label>
+    <div class="row"><button class="primary darkbtn" onclick="saveCloud()">Save Cloud Settings</button><button class="secondary" onclick="testCloud()">Test Connection</button></div>
+    <div id="cloudStatus" class="status"></div>
   </div>
-</section>
-
-<section id="mistakes" class="page">
-  <div class="sectiontitle"><div><span class="eyebrow">MISTAKE INTELLIGENCE</span><h1>Mistake Patterns</h1></div></div>
-  <div class="grid two">
-    <div class="card"><h2>Type breakdown</h2><div id="mistakeTypes"></div></div>
-    <div class="card"><h2>Weak chapters from mocks</h2><div id="weakTopics"></div></div>
+  <div class="card">
+    <h2>💾 Local Backup</h2>
+    <p class="hint">Download your NEETOS data as JSON, or restore it later.</p>
+    <div class="row"><button class="primary darkbtn" onclick="exportData()">Export Backup</button><label class="filebtn">Import Backup<input id="backupFile" type="file" accept=".json"></label></div>
+    <div id="backupStatus" class="status"></div>
   </div>
+  <div class="card"><h2>ℹ️ V3 privacy</h2><p class="hint">Your data remains in this browser unless you explicitly configure cloud sync. NEETOS never asks for your PW login credentials.</p></div>
 </section>
 </main>
-
-<footer>NEETOS V2.2 • Data stays in your browser (localStorage).</footer>
+<footer>NEETOS V3 • Free-first • Mobile-first • No PW credentials required</footer>
 <script src="app.js"></script>
 </body>
 </html>
