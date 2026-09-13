@@ -1,0 +1,15 @@
+{
+  "name": "NEETOS – NEET 2027 Tracker",
+  "short_name": "NEETOS",
+  "description": "Simple NEET 2027 syllabus and mock tracker.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6f7fb",
+  "theme_color": "#111827",
+  "icons": [
+    {"src":"icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+  ]
+}
