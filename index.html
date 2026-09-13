@@ -1,112 +1,20 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NEETOS V3</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<header class="top">
-  <div><div class="brand">NEETOS</div><div class="sub">AI Mentor • Cloud • Schedule Import • V3</div></div>
-  <button id="themeBtn" class="iconbtn">☀️</button>
-</header>
-<nav class="tabs">
-  <button data-tab="dashboard" class="active">Dashboard</button>
-  <button data-tab="mentor">AI Mentor</button>
-  <button data-tab="schedule">Schedule</button>
-  <button data-tab="mocks">Mocks</button>
-  <button data-tab="settings">Cloud</button>
-</nav>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NEETOS V4</title><link rel="stylesheet" href="style.css"></head><body>
+<header class="top"><div><b class="brand">NEETOS</b><div class="sub">NEET Command Center • V4</div></div><button id="theme" class="icon">☀️</button></header>
+<nav class="tabs"><button class="active" data-tab="home">Home</button><button data-tab="chapters">Chapters</button><button data-tab="classes">Live Classes</button><button data-tab="practice">DPP / PYQ / Module</button><button data-tab="mocks">Mocks</button><button data-tab="backup">Backup</button></nav>
 <main>
-<section id="dashboard" class="page active">
-  <div class="hero"><div><span class="eyebrow">NEETOS V3</span><h1 id="command">Your NEET command center.</h1><p id="subcommand">Study smarter. Track everything.</p></div><button class="primary" onclick="showTab('mentor')">Ask Mentor →</button></div>
-  <div class="grid four">
-    <div class="card stat"><span>Latest Score</span><strong id="latestScore">—</strong><small>/720</small></div>
-    <div class="card stat"><span>Best Score</span><strong id="bestScore">—</strong><small>/720</small></div>
-    <div class="card stat"><span>Accuracy</span><strong id="accuracy">—</strong></div>
-    <div class="card stat"><span>Readiness</span><strong id="readiness">—</strong><small>/100</small></div>
-  </div>
-  <div class="grid two">
-    <div class="card"><div class="cardhead"><h2>🧠 Today's AI plan</h2></div><div id="todayPlan" class="plan"></div></div>
-    <div class="card"><div class="cardhead"><h2>⏳ Next Mock</h2></div><div id="countdown" class="countdown">No date set</div><input id="nextMockDate" type="datetime-local"><button class="secondary full" onclick="saveCountdown()">Save Countdown</button></div>
-  </div>
-  <div class="grid two">
-    <div class="card"><h2>📈 Score Trend</h2><div id="chart" class="chart empty">Add mocks to see trend.</div></div>
-    <div class="card"><h2>🎯 Subject Strength</h2><div id="subjects"></div></div>
-  </div>
-</section>
+<section id="home" class="page active"><div class="hero"><div><small>V4 • SMART TRACKER</small><h1 id="headline">Your preparation, one place.</h1><p id="next">Complete a few tasks to unlock smart priorities.</p></div><button class="primary" onclick="tab('chapters')">Open Tracker →</button></div>
+<div class="grid four"><div class="card stat"><span>Readiness</span><strong id="ready">0</strong><small>/100</small></div><div class="card stat"><span>Live classes</span><strong id="attended">0</strong><small>attended</small></div><div class="card stat"><span>Practice</span><strong id="practicePct">0%</strong><small>complete</small></div><div class="card stat"><span>Latest mock</span><strong id="score">—</strong><small>/720</small></div></div>
+<div class="grid two"><div class="card"><h2>🎯 Today's priorities</h2><div id="priorities" class="plan"></div></div><div class="card"><h2>📊 Overall pipeline</h2><div id="pipeline"></div></div></div>
+<div class="card"><h2>🔗 Automatic vs manual</h2><p class="hint">V4 keeps the workflow ready for official integrations. Until a platform exposes an authorised API/import, NEETOS cannot secretly read another app's private activity. Use one-tap marking or import your own exported data—never share passwords.</p></div></section>
 
-<section id="mentor" class="page">
-  <div class="sectiontitle"><span class="eyebrow">PERSONAL STUDY MENTOR</span><h1>Ask NEETOS</h1></div>
-  <div class="card mentorbox">
-    <div class="suggestions">
-      <button onclick="ask('What should I study now?')">What should I study now?</button>
-      <button onclick="ask('Why is my score low?')">Why is my score low?</button>
-      <button onclick="ask('How should I revise?')">How should I revise?</button>
-      <button onclick="ask('What should I do before my next mock?')">Next mock strategy</button>
-    </div>
-    <div id="chat" class="chat"><div class="bubble bot">Main NEETOS Mentor hoon. Tumhare mocks, syllabus aur schedule ko dekhkar practical next step dunga.</div></div>
-    <div class="askrow"><input id="question" placeholder="Ask anything about your NEET preparation…"><button class="primary darkbtn" onclick="ask()">Ask</button></div>
-    <p class="hint">V3 mentor is a free rule-based study coach. Real external AI API is not required for this version.</p>
-  </div>
-</section>
+<section id="chapters" class="page"><div class="title"><small>CHAPTER ENGINE</small><h1>Lecture → DPP → Module → PYQ → Revision → Test</h1></div>
+<div class="card"><div class="row"><input id="search" placeholder="Search chapter…"><select id="subjectFilter"><option value="">All subjects</option><option>Physics</option><option>Chemistry</option><option>Biology</option></select><button class="secondary" onclick="addChapter()">+ Add chapter</button></div></div><div id="chapterList"></div></section>
 
-<section id="schedule" class="page">
-  <div class="sectiontitle"><span class="eyebrow">SCHEDULE IMPORT</span><h1>PW / Study Schedule</h1></div>
-  <div class="card">
-    <h2>📥 Import CSV or JSON</h2>
-    <p class="hint">Export/copy your study schedule into a simple CSV or JSON file. NEETOS will store it locally. No PW password is ever needed.</p>
-    <input id="scheduleFile" type="file" accept=".csv,.json,text/csv,application/json">
-    <div id="importStatus" class="status"></div>
-  </div>
-  <div class="card">
-    <div class="cardhead"><h2>Today's schedule</h2><button class="secondary" onclick="clearSchedule()">Clear</button></div>
-    <div id="scheduleList"></div>
-  </div>
-</section>
+<section id="classes" class="page"><div class="title"><small>LIVE CLASS ONLY</small><h1>Live Class Attendance</h1></div><div class="card"><div class="formgrid"><label>Date<input id="cd" type="date"></label><label>Subject<input id="cs" placeholder="Physics"></label><label>Class / Topic<input id="ct" placeholder="Live lecture topic"></label><label>Duration (min)<input id="cm" type="number" min="1"></label></div><button class="primary dark" onclick="addClass()">Add live class</button><p class="hint">Only classes you explicitly add here are tracked. Mark attended/missed yourself.</p></div><div class="card"><h2>Class history</h2><div id="classList"></div></div></section>
 
-<section id="mocks" class="page">
-  <div class="sectiontitle"><span class="eyebrow">MOCK INTELLIGENCE</span><h1>Mock Results</h1></div>
-  <div class="card formcard">
-    <div class="formgrid">
-      <label>Mock name<input id="mName" placeholder="Mock 05"></label>
-      <label>Date<input id="mDate" type="date"></label>
-      <label>Physics<input id="mPhy" type="number" min="0" max="180"></label>
-      <label>Chemistry<input id="mChem" type="number" min="0" max="180"></label>
-      <label>Biology<input id="mBio" type="number" min="0" max="360"></label>
-      <label>Correct<input id="mCorrect" type="number" min="0"></label>
-      <label>Wrong<input id="mWrong" type="number" min="0"></label>
-      <label>Unattempted<input id="mUnattempted" type="number" min="0"></label>
-      <label>Mistake type<select id="mMistake"><option>Conceptual</option><option>Calculation</option><option>Memory</option><option>Silly</option><option>Misread</option></select></label>
-      <label>Weak chapter<input id="mWeak" placeholder="e.g. Current Electricity"></label>
-    </div>
-    <div class="preview"><b>Total:</b> <span id="formTotal">0</span>/720 &nbsp; <b>Accuracy:</b> <span id="formAcc">—</span></div>
-    <button class="primary darkbtn" onclick="addMock()">Save Mock</button>
-  </div>
-  <div class="card"><div class="cardhead"><h2>History</h2><button class="secondary" onclick="clearMocks()">Clear All</button></div><div id="mockList"></div></div>
-</section>
+<section id="practice" class="page"><div class="title"><small>PRACTICE TRACKER</small><h1>DPP • PYQ • Module • Questions</h1></div><div class="card"><div class="formgrid"><label>Type<select id="pt"><option>DPP</option><option>PYQ</option><option>Module</option><option>Question Practice</option></select></label><label>Subject<input id="ps" placeholder="Chemistry"></label><label>Chapter<input id="pc" placeholder="Chemical Bonding"></label><label>Total questions<input id="pq" type="number" min="1"></label><label>Correct<input id="pco" type="number" min="0"></label><label>Date<input id="pd" type="date"></label></div><button class="primary dark" onclick="addPractice()">Save practice</button></div><div class="card"><h2>Practice history</h2><div id="practiceList"></div></div></section>
 
-<section id="settings" class="page">
-  <div class="sectiontitle"><span class="eyebrow">CLOUD SYNC</span><h1>Backup & Settings</h1></div>
-  <div class="card">
-    <h2>☁️ Optional Supabase Cloud</h2>
-    <p class="hint">V3 works fully offline. For cloud sync, create your own Supabase project and paste its project URL + anon/publishable key here. Never enter a PW password or private/service-role key.</p>
-    <label>Supabase Project URL<input id="sbUrl" placeholder="https://your-project.supabase.co"></label>
-    <label>Supabase anon/publishable key<input id="sbKey" placeholder="Paste public anon/publishable key"></label>
-    <div class="row"><button class="primary darkbtn" onclick="saveCloud()">Save Cloud Settings</button><button class="secondary" onclick="testCloud()">Test Connection</button></div>
-    <div id="cloudStatus" class="status"></div>
-  </div>
-  <div class="card">
-    <h2>💾 Local Backup</h2>
-    <p class="hint">Download your NEETOS data as JSON, or restore it later.</p>
-    <div class="row"><button class="primary darkbtn" onclick="exportData()">Export Backup</button><label class="filebtn">Import Backup<input id="backupFile" type="file" accept=".json"></label></div>
-    <div id="backupStatus" class="status"></div>
-  </div>
-  <div class="card"><h2>ℹ️ V3 privacy</h2><p class="hint">Your data remains in this browser unless you explicitly configure cloud sync. NEETOS never asks for your PW login credentials.</p></div>
-</section>
-</main>
-<footer>NEETOS V3 • Free-first • Mobile-first • No PW credentials required</footer>
-<script src="app.js"></script>
-</body>
-</html>
+<section id="mocks" class="page"><div class="title"><small>MOCK INTELLIGENCE</small><h1>Mock Results</h1></div><div class="card"><div class="formgrid"><label>Name<input id="mn" placeholder="Mock 01"></label><label>Date<input id="md" type="date"></label><label>Physics<input id="mp" type="number" max="180"></label><label>Chemistry<input id="mc" type="number" max="180"></label><label>Biology<input id="mb" type="number" max="360"></label><label>Correct<input id="mcr" type="number"></label><label>Wrong<input id="mwr" type="number"></label><label>Weak chapter<input id="mwk"></label></div><button class="primary dark" onclick="addMock()">Save mock</button></div><div class="card"><h2>Mock history</h2><div id="mockList"></div></div></section>
+
+<section id="backup" class="page"><div class="title"><small>DATA CONTROL</small><h1>Backup & Import</h1></div><div class="card"><h2>💾 Your data</h2><button class="primary dark" onclick="exportData()">Export NEETOS backup</button> <label class="filebtn">Restore backup<input id="restore" type="file" accept=".json"></label><div id="bstatus" class="status"></div></div><div class="card"><h2>📥 Import activity</h2><p class="hint">Import your own CSV/JSON export. This is the safe bridge for future official integrations.</p><input id="import" type="file" accept=".csv,.json"><div id="istatus" class="status"></div></div><div class="card"><h2>🧩 Integration-ready design</h2><p class="hint">When an authorised API is available, an adapter can map: live-class attendance → classes, DPP/PYQ/module results → practice, mock results → mocks. V4 itself does not bypass app security or scrape private accounts.</p></div></section>
+</main><footer>NEETOS V4 • Free-first • Mobile-first • Local by default</footer><script src="app.js"></script></body></html>
